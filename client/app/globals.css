@@ -3,6 +3,9 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --pharmacy-primary: #10b981; /* emerald-500 */
+  --pharmacy-secondary: #14b8a6; /* teal-500 */
+  --pharmacy-accent: #06b6d4; /* cyan-500 */
 }
 
 @theme inline {
@@ -10,6 +13,11 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Custom Pharmacy Theme Colors */
+  --color-pharmacy-primary: var(--pharmacy-primary);
+  --color-pharmacy-secondary: var(--pharmacy-secondary);
+  --color-pharmacy-accent: var(--pharmacy-accent);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -24,3 +32,23 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Custom scrollbar untuk tema Modern Pharmacy */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--pharmacy-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #059669; /* emerald-600 */
+}
+

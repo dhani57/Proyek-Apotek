@@ -1,14 +1,112 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enum untuk Role User
+enum Role {
+  ADMIN
+  KASIR
+  PELANGGAN
+}
+
+// Model User - untuk autentikasi dan otorisasi
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(PELANGGAN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relasi
+  transactions Transaction[]
+
+  @@map("users")
+}
+
+// Model Category - kategori obat
+model Category {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relasi
+  products Product[]
+
+  @@map("categories")
+}
+
+// Model Product/Medicine - data obat
+model Product {
+  id              String    @id @default(uuid())
+  name            String
+  description     String?
+  sellPrice       Decimal   @db.Decimal(10, 2)
+  buyPrice        Decimal   @db.Decimal(10, 2)
+  stock           Int       @default(0)
+  unit            String    // tablet, botol, box, dll
+  batchNumber     String?
+  expirationDate  DateTime?
+  imageUrl        String?
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relasi
+  categoryId      String
+  category        Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  transactionItems TransactionItem[]
+
+  @@map("products")
+}
+
+// Model Transaction - transaksi penjualan
+model Transaction {
+  id            String   @id @default(uuid())
+  transactionNo String   @unique
+  totalPrice    Decimal  @db.Decimal(12, 2)
+  paymentMethod String   // cash, debit, credit, e-wallet
+  status        String   @default("completed") // completed, cancelled
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relasi
+  cashierId     String
+  cashier       User     @relation(fields: [cashierId], references: [id])
+  
+  items         TransactionItem[]
+
+  @@map("transactions")
+}
+
+// Model TransactionItem - detail item per transaksi
+model TransactionItem {
+  id            String      @id @default(uuid())
+  quantity      Int
+  price         Decimal     @db.Decimal(10, 2)
+  subtotal      Decimal     @db.Decimal(12, 2)
+  createdAt     DateTime    @default(now())
+
+  // Relasi
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  
+  productId     String
+  product       Product     @relation(fields: [productId], references: [id])
+
+  @@map("transaction_items")
 }

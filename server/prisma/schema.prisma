@@ -36,11 +36,11 @@ model User {
 
 // Model Category - kategori obat
 model Category {
-  id          String    @id @default(uuid())
-  name        String    @unique
+  id          String   @id @default(uuid())
+  name        String   @unique
   description String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relasi
   products Product[]
@@ -50,24 +50,24 @@ model Category {
 
 // Model Product/Medicine - data obat
 model Product {
-  id              String    @id @default(uuid())
-  name            String
-  description     String?
-  sellPrice       Decimal   @db.Decimal(10, 2)
-  buyPrice        Decimal   @db.Decimal(10, 2)
-  stock           Int       @default(0)
-  unit            String    // tablet, botol, box, dll
-  batchNumber     String?
-  expirationDate  DateTime?
-  imageUrl        String?
-  isActive        Boolean   @default(true)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id             String    @id @default(uuid())
+  name           String
+  description    String?
+  sellPrice      Decimal   @db.Decimal(10, 2)
+  buyPrice       Decimal   @db.Decimal(10, 2)
+  stock          Int       @default(0)
+  unit           String // tablet, botol, box, dll
+  batchNumber    String?
+  expirationDate DateTime?
+  imageUrl       String?
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   // Relasi
-  categoryId      String
-  category        Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
   transactionItems TransactionItem[]
 
   @@map("products")
@@ -78,35 +78,35 @@ model Transaction {
   id            String   @id @default(uuid())
   transactionNo String   @unique
   totalPrice    Decimal  @db.Decimal(12, 2)
-  paymentMethod String   // cash, debit, credit, e-wallet
+  paymentMethod String // cash, debit, credit, e-wallet
   status        String   @default("completed") // completed, cancelled
   notes         String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   // Relasi
-  cashierId     String
-  cashier       User     @relation(fields: [cashierId], references: [id])
-  
-  items         TransactionItem[]
+  cashierId String
+  cashier   User   @relation(fields: [cashierId], references: [id])
+
+  items TransactionItem[]
 
   @@map("transactions")
 }
 
 // Model TransactionItem - detail item per transaksi
 model TransactionItem {
-  id            String      @id @default(uuid())
-  quantity      Int
-  price         Decimal     @db.Decimal(10, 2)
-  subtotal      Decimal     @db.Decimal(12, 2)
-  createdAt     DateTime    @default(now())
+  id        String   @id @default(uuid())
+  quantity  Int
+  price     Decimal  @db.Decimal(10, 2)
+  subtotal  Decimal  @db.Decimal(12, 2)
+  createdAt DateTime @default(now())
 
   // Relasi
   transactionId String
   transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
-  
-  productId     String
-  product       Product     @relation(fields: [productId], references: [id])
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
 
   @@map("transaction_items")
 }

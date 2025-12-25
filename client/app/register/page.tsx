@@ -116,7 +116,7 @@ export default function RegisterPage() {
             <Pill className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            Apotek Sehat
+            Apotek B213
           </h1>
           <p className="text-gray-600">
             Daftar Akun Baru
@@ -319,7 +319,7 @@ export default function RegisterPage() {
 
         {/* Footer */}
         <p className="text-center text-gray-500 text-sm mt-6">
-          © 2024 Apotek Sehat. Semua hak dilindungi.
+          © 2024 Apotek B213. Semua hak dilindungi.
         </p>
       </div>
     </div>

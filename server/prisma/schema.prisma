@@ -46,6 +46,22 @@ model Category {
   @@map("categories")
 }
 
+// Model Supplier - pemasok obat
+model Supplier {
+  id        String   @id @default(uuid())
+  name      String
+  phone     String
+  address   String
+  email     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relasi
+  products Product[]
+
+  @@map("suppliers")
+}
+
 // Model Product/Medicine - data obat
 model Product {
   id             String    @id @default(uuid())
@@ -65,6 +81,9 @@ model Product {
   // Relasi
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  supplierId String?
+  supplier   Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
 
   transactionItems TransactionItem[]
 

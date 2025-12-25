@@ -24,6 +24,18 @@ interface TransactionData {
   notes?: string;
 }
 
+interface CategoryData {
+  name: string;
+  description?: string;
+}
+
+interface SupplierData {
+  name: string;
+  phone: string;
+  address: string;
+  email?: string;
+}
+
 async function fetchWithAuth(url: string, options: RequestInit = {}) {
   const token = getAuthToken();
   
@@ -74,4 +86,22 @@ export const transactionApi = {
     if (endDate) params.append('endDate', endDate);
     return fetchWithAuth(`/transactions/statistics${params.toString() ? `?${params.toString()}` : ''}`);
   },
+};
+
+// Category API
+export const categoryApi = {
+  getAll: () => fetchWithAuth('/categories'),
+  getOne: (id: string) => fetchWithAuth(`/categories/${id}`),
+  create: (data: CategoryData) => fetchWithAuth('/categories', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id: string, data: Partial<CategoryData>) => fetchWithAuth(`/categories/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  delete: (id: string) => fetchWithAuth(`/categories/${id}`, { method: 'DELETE' }),
+};
+
+// Supplier API
+export const supplierApi = {
+  getAll: () => fetchWithAuth('/suppliers'),
+  getOne: (id: string) => fetchWithAuth(`/suppliers/${id}`),
+  create: (data: SupplierData) => fetchWithAuth('/suppliers', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id: string, data: Partial<SupplierData>) => fetchWithAuth(`/suppliers/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  delete: (id: string) => fetchWithAuth(`/suppliers/${id}`, { method: 'DELETE' }),
 };

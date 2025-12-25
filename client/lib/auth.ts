@@ -80,19 +80,29 @@ export const removeAuthToken = () => {
 };
 
 export const setUser = (user: User) => {
-  localStorage.setItem('user', JSON.stringify(user));
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('user', JSON.stringify(user));
+  }
 };
 
 export const getUser = (): User | null => {
-  const user = localStorage.getItem('user');
-  return user ? JSON.parse(user) : null;
+  if (typeof window !== 'undefined') {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
+  }
+  return null;
 };
 
 export const removeUser = () => {
-  localStorage.removeItem('user');
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('user');
+  }
 };
 
 export const isAdmin = (): boolean => {
-  const user = getUser();
-  return user?.role === 'ADMIN';
+  if (typeof window !== 'undefined') {
+    const user = getUser();
+    return user?.role === 'ADMIN';
+  }
+  return false;
 };

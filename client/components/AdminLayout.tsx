@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -10,7 +10,10 @@ import {
   AlertTriangle,
   LogOut,
   Menu,
-  X
+  X,
+  FolderTree,
+  Truck,
+  CreditCard
 } from 'lucide-react';
 import { removeAuthToken, removeUser, getUser } from '@/lib/auth';
 
@@ -18,7 +21,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const user = getUser();
+  const [user, setUser] = useState<{
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const userData = getUser();
+    setUser(userData);
+  }, []);
 
   const handleLogout = () => {
     removeAuthToken();
@@ -37,14 +50,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         }`}
       >
         <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between p-6">
-            <h1 className="text-2xl font-bold text-white">Admin Panel</h1>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="text-white lg:hidden"
-            >
-              <X className="h-6 w-6" />
-            </button>
+          <div className="flex flex-col p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                {/* Logo placeholder - user akan tambahkan nanti */}
+                <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                  <span className="text-emerald-600 font-bold text-xl">A</span>
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-white">Administrator</h1>
+                  <p className="text-emerald-200 text-xs">Apotek B213</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="text-white lg:hidden"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
           </div>
 
           <nav className="flex-1 px-4 space-y-2">
@@ -73,6 +97,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </Link>
 
             <Link
+              href="/admin/cashier"
+              className={`flex items-center gap-3 px-4 py-3 text-white rounded-lg transition-colors ${
+                isActive('/admin/cashier')
+                  ? 'bg-emerald-700'
+                  : 'hover:bg-emerald-700'
+              }`}
+            >
+              <CreditCard className="h-5 w-5" />
+              <span>Kasir</span>
+            </Link>
+
+            <Link
               href="/admin/transactions"
               className={`flex items-center gap-3 px-4 py-3 text-white rounded-lg transition-colors ${
                 isActive('/admin/transactions')
@@ -94,6 +130,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               <AlertTriangle className="h-5 w-5" />
               <span>Alerts</span>
+            </Link>
+
+            <Link
+              href="/admin/categories"
+              className={`flex items-center gap-3 px-4 py-3 text-white rounded-lg transition-colors ${
+                isActive('/admin/categories')
+                  ? 'bg-emerald-700'
+                  : 'hover:bg-emerald-700'
+              }`}
+            >
+              <FolderTree className="h-5 w-5" />
+              <span>Categories</span>
+            </Link>
+
+            <Link
+              href="/admin/suppliers"
+              className={`flex items-center gap-3 px-4 py-3 text-white rounded-lg transition-colors ${
+                isActive('/admin/suppliers')
+                  ? 'bg-emerald-700'
+                  : 'hover:bg-emerald-700'
+              }`}
+            >
+              <Truck className="h-5 w-5" />
+              <span>Suppliers</span>
             </Link>
           </nav>
 

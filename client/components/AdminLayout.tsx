@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -21,17 +21,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [user, setUser] = useState<{
+  // Lazy initialization untuk menghindari cascading renders
+  const [user] = useState<{
     id: string;
     email: string;
     name: string;
     role: string;
-  } | null>(null);
-
-  useEffect(() => {
-    const userData = getUser();
-    setUser(userData);
-  }, []);
+  } | null>(() => {
+    // Check if window is defined (client-side only)
+    if (typeof window !== 'undefined') {
+      return getUser();
+    }
+    return null;
+  });
 
   const handleLogout = () => {
     removeAuthToken();

@@ -90,10 +90,10 @@ export default function LoginPage() {
             <Pill className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            Apotek B213
+            Login Admin
           </h1>
           <p className="text-gray-600">
-            Sistem Manajemen Apotek Terintegrasi
+            Apotek B213 - Sistem Manajemen
           </p>
         </div>
 
@@ -194,25 +194,14 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500">atau</span>
-            </div>
-          </div>
-
-          {/* Register Link */}
-          <div className="text-center">
+          {/* Back to Home Link */}
+          <div className="text-center mt-6">
             <p className="text-gray-600">
-              Belum punya akun?{' '}
               <Link
-                href="/register"
+                href="/"
                 className="text-emerald-600 hover:text-emerald-700 font-semibold"
               >
-                Daftar sekarang
+                ← Kembali ke Halaman Utama
               </Link>
             </p>
           </div>

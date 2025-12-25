@@ -1,11 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Lock, Mail, Eye, EyeOff, Pill } from 'lucide-react';
+import { authApi, setAuthToken, setUser } from '@/lib/auth';
 
 export default function LoginPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -13,6 +17,7 @@ export default function LoginPage() {
   const [errors, setErrors] = useState({
     email: '',
     password: '',
+    general: '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,13 +25,13 @@ export default function LoginPage() {
     setFormData(prev => ({ ...prev, [name]: value }));
     // Clear error when user starts typing
     if (errors[name as keyof typeof errors]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors(prev => ({ ...prev, [name]: '', general: '' }));
     }
   };
 
   const validateForm = () => {
     let isValid = true;
-    const newErrors = { email: '', password: '' };
+    const newErrors = { email: '', password: '', general: '' };
 
     // Email validation
     if (!formData.email) {
@@ -50,12 +55,29 @@ export default function LoginPage() {
     return isValid;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      // TODO: Integrate with backend API
-      console.log('Login data:', formData);
-      alert('Login berhasil! (Integrasi backend belum tersedia)');
+      setIsLoading(true);
+      try {
+        const response = await authApi.login(formData.email, formData.password);
+        
+        // Save token and user data
+        setAuthToken(response.access_token);
+        setUser(response.user);
+        
+        // Redirect based on role
+        if (response.user.role === 'ADMIN') {
+          router.push('/admin');
+        } else {
+          router.push('/');
+        }
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Login gagal. Silakan coba lagi.';
+        setErrors(prev => ({ ...prev, general: errorMessage }));
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -155,12 +177,20 @@ export default function LoginPage() {
               </Link>
             </div>
 
+            {/* Error Message */}
+            {errors.general && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-600">{errors.general}</p>
+              </div>
+            )}
+
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold py-3 rounded-lg hover:from-emerald-600 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg"
+              disabled={isLoading}
+              className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold py-3 rounded-lg hover:from-emerald-600 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Masuk
+              {isLoading ? 'Memproses...' : 'Masuk'}
             </button>
           </form>
 

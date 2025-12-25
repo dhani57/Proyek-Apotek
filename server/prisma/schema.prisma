@@ -3,7 +3,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -14,7 +13,6 @@ datasource db {
 // Enum untuk Role User
 enum Role {
   ADMIN
-  KASIR
   PELANGGAN
 }
 

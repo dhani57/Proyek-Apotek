@@ -47,23 +47,27 @@ export default function CustomerPage() {
       const medicinesData = await medicinesRes.json();
       const categoriesData = await categoriesRes.json();
 
-      setMedicines(medicinesData);
-      setCategories(categoriesData);
+      // Ensure medicinesData is an array
+      setMedicines(Array.isArray(medicinesData) ? medicinesData : []);
+      setCategories(Array.isArray(categoriesData) ? categoriesData : []);
     } catch (error) {
       console.error('Failed to load data:', error);
+      // Set empty arrays on error
+      setMedicines([]);
+      setCategories([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredMedicines = medicines.filter((medicine) => {
+  const filteredMedicines = Array.isArray(medicines) ? medicines.filter((medicine) => {
     const matchesSearch =
       medicine.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       medicine.genericName.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory =
       selectedCategory === 'all' || medicine.categoryId === selectedCategory;
     return matchesSearch && matchesCategory && medicine.stock > 0;
-  });
+  }) : [];
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('id-ID', {

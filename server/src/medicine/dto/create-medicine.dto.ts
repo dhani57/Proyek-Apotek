@@ -10,7 +10,11 @@ import {
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 export class CreateMedicineDto {
   @IsString()
-  name: string;
+  @IsOptional()
+  plu?: string; // Product Look Up code
+
+  @IsString()
+  name: string; // Item Name
 
   @IsString()
   @IsOptional()
@@ -18,18 +22,66 @@ export class CreateMedicineDto {
 
   @IsNumber()
   @Min(0)
-  sellPrice: number;
+  @IsOptional()
+  purchasePrice?: number; // Purchase Price
 
   @IsNumber()
   @Min(0)
-  buyPrice: number;
+  sellPrice: number; // Sales Price
+
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  buyPrice?: number; // Keep for backward compatibility
 
   @IsNumber()
   @Min(0)
   stock: number;
 
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  stockMinimal?: number; // Stock Minimal
+
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  stockMaximal?: number; // Stock Maximal
+
   @IsString()
-  unit: string;
+  unit: string; // Unit Code
+
+  @IsString()
+  @IsOptional()
+  unitCode?: string; // Unit Code (alias)
+
+  @IsString()
+  @IsOptional()
+  purchaseUnitCode?: string; // Purchase Unit Code
+
+  @IsNumber()
+  @IsOptional()
+  unitConversion?: number; // Unit Conversion
+
+  @IsString()
+  @IsOptional()
+  status?: string; // Status (active/inactive)
+
+  @IsString()
+  @IsOptional()
+  rackLocation?: string; // Rack Location
+
+  @IsNumber()
+  @IsOptional()
+  margin?: number; // Margin
+
+  @IsString()
+  @IsOptional()
+  onlineSku?: string; // Online SKU
+
+  @IsString()
+  @IsOptional()
+  barcode?: string; // Barcode
 
   @IsString()
   @IsOptional()
@@ -48,5 +100,9 @@ export class CreateMedicineDto {
   isActive?: boolean;
 
   @IsString()
-  categoryId: string;
+  categoryId: string; // Category
+
+  @IsString()
+  @IsOptional()
+  supplierId?: string; // Supplier
 }

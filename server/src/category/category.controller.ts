@@ -16,12 +16,11 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 
 @Controller('categories')
-@UseGuards(JwtAuthGuard)
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Post()
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);
@@ -38,7 +37,7 @@ export class CategoryController {
   }
 
   @Patch(':id')
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   update(
     @Param('id') id: string,
@@ -48,7 +47,7 @@ export class CategoryController {
   }
 
   @Delete(':id')
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   remove(@Param('id') id: string) {
     return this.categoryService.remove(id);

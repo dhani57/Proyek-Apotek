@@ -64,19 +64,31 @@ model Supplier {
 
 // Model Product/Medicine - data obat
 model Product {
-  id             String    @id @default(uuid())
-  name           String
-  description    String?
-  sellPrice      Decimal   @db.Decimal(10, 2)
-  buyPrice       Decimal   @db.Decimal(10, 2)
-  stock          Int       @default(0)
-  unit           String // tablet, botol, box, dll
-  batchNumber    String?
-  expirationDate DateTime?
-  imageUrl       String?
-  isActive       Boolean   @default(true)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id                String    @id @default(uuid())
+  plu               String?   // Product Look Up code
+  name              String    // Item Name
+  description       String?
+  purchasePrice     Decimal   @db.Decimal(10, 2) // Purchase Price
+  sellPrice         Decimal   @db.Decimal(10, 2) // Sales Price (was sellPrice)
+  buyPrice          Decimal   @db.Decimal(10, 2) // Keep for backward compatibility
+  stock             Int       @default(0)
+  stockMinimal      Int?      @default(0) // Stock Minimal
+  stockMaximal      Int?      // Stock Maximal
+  unit              String    // Unit Code
+  unitCode          String?   // Unit Code (alias)
+  purchaseUnitCode  String?   // Purchase Unit Code
+  unitConversion    Decimal?  @db.Decimal(10, 4) // Unit Conversion
+  status            String?   @default("active") // Status
+  rackLocation      String?   // Rack Location
+  margin            Decimal?  @db.Decimal(10, 2) // Margin
+  onlineSku         String?   // Online SKU
+  barcode           String?   // Barcode
+  batchNumber       String?
+  expirationDate    DateTime?
+  imageUrl          String?
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   // Relasi
   categoryId String

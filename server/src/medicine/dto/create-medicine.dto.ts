@@ -100,9 +100,18 @@ export class CreateMedicineDto {
   isActive?: boolean;
 
   @IsString()
-  categoryId: string; // Category
+  @IsOptional()
+  categoryId?: string; // Category ID
 
   @IsString()
   @IsOptional()
-  supplierId?: string; // Supplier
+  category?: string; // Category Name (for auto-create)
+
+  @IsString()
+  @IsOptional()
+  supplierId?: string; // Supplier ID
+  
+  @IsString()
+  @IsOptional()
+  supplier?: string; // Supplier Name (for auto-create)
 }

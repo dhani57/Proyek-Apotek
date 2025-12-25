@@ -232,7 +232,11 @@ function InventoryPage() {
         margin: parseFloat(String(row.Margin || row.margin || '0')),
         onlineSku: String(row['Online SKU'] || row.onlineSku || row.online_sku || ''),
         barcode: String(row.Barcode || row.barcode || ''),
-        categoryId: String(row.categoryId || row.category_id || row['Category ID'] || ''),
+        // Kirim nama kategori untuk auto-create
+        category: String(row.Category || row.category || ''),
+        categoryId: row.categoryId || row.category_id || row['Category ID'] ? String(row.categoryId || row.category_id || row['Category ID']) : undefined,
+        // Kirim nama supplier untuk auto-create
+        supplier: row.Supplier || row.supplier ? String(row.Supplier || row.supplier) : undefined,
         supplierId: row.supplierId || row.supplier_id || row['Supplier ID'] ? String(row.supplierId || row.supplier_id || row['Supplier ID']) : undefined,
       }));
 
@@ -270,9 +274,9 @@ function InventoryPage() {
   const downloadTemplate = () => {
     // Template sesuai format data existing dari apotek
     const template = 'No,PLU,Item Name,Purchase Price,Sales Price,Stock,Stock Minimal,Stock Maximal,Unit Code,Purchase Unit Code,Unit Conversion,Status,Rack Location,Margin,Online SKU,Barcode,Category,Supplier\n' +
-      '1,701570,POT PLASTIK 50 CC,8000,10000,500,10,1000,POT,BOX,50,Aktif,WADAH,2000,DEX1PT10-0,701570,category-id-here,supplier-id-here\n' +
-      '2,PP0001,POT PLASTIK 65 CC,8000,10000,500,10,1000,POT,BOX,50,Aktif,WADAH,2000,,PP0001,category-id-here,supplier-id-here\n' +
-      '3,BTL001,BOTOL KOSONG PLASTIK 30 ML,7000,10000,500,10,1000,BTL,BOX,30,Aktif,WADAH,3000,BTL001,,category-id-here,supplier-id-here';
+      '1,701570,POT PLASTIK 50 CC,8000,10000,500,10,1000,POT,BOX,50,Aktif,WADAH,2000,DEX1PT10-0,701570,Wadah,PT Sumber Medika\n' +
+      '2,PP0001,POT PLASTIK 65 CC,8000,10000,500,10,1000,POT,BOX,50,Aktif,WADAH,2000,,PP0001,Wadah,PT Sumber Medika\n' +
+      '3,BTL001,BOTOL KOSONG PLASTIK 30 ML,7000,10000,500,10,1000,BTL,BOX,30,Aktif,WADAH,3000,BTL001,,Wadah,PT Kimia Farma';
     
     const blob = new Blob([template], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
@@ -305,8 +309,8 @@ function InventoryPage() {
         'Margin': 2000,
         'Online SKU': 'DEX1PT10-0',
         'Barcode': '701570',
-        'Category': 'category-id-here',
-        'Supplier': 'supplier-id-here'
+        'Category': 'Wadah',
+        'Supplier': 'PT Sumber Medika'
       },
       {
         'No': 2,
@@ -325,8 +329,8 @@ function InventoryPage() {
         'Margin': 2000,
         'Online SKU': '',
         'Barcode': 'PP0001',
-        'Category': 'category-id-here',
-        'Supplier': 'supplier-id-here'
+        'Category': 'Wadah',
+        'Supplier': 'PT Sumber Medika'
       },
       {
         'No': 3,
@@ -345,8 +349,8 @@ function InventoryPage() {
         'Margin': 3000,
         'Online SKU': 'BTL001',
         'Barcode': '',
-        'Category': 'category-id-here',
-        'Supplier': 'supplier-id-here'
+        'Category': 'Wadah',
+        'Supplier': 'PT Kimia Farma'
       }
     ];
 

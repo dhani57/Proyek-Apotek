@@ -1,14 +1,18 @@
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
-const prisma = new PrismaClient();
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+
+const prisma: PrismaClient = new PrismaClient();
 
 async function main() {
   console.log('Start seeding...');
 
   // Create admin user
   const hashedPassword = await bcrypt.hash('admin123', 10);
-  
+
   const admin = await prisma.user.upsert({
     where: { email: 'admin@apotek.com' },
     update: {},

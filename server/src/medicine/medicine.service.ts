@@ -44,7 +44,7 @@ export class MedicineService {
 
   async update(id: string, updateMedicineDto: UpdateMedicineDto) {
     await this.findOne(id); // Check if exists
-    
+
     return this.prisma.product.update({
       where: { id },
       data: updateMedicineDto,
@@ -56,7 +56,7 @@ export class MedicineService {
 
   async remove(id: string) {
     await this.findOne(id); // Check if exists
-    
+
     return this.prisma.product.delete({
       where: { id },
     });

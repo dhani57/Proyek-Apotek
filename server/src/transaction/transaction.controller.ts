@@ -14,13 +14,25 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 
+interface RequestWithUser extends Request {
+  user: {
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+  };
+}
+
 @Controller('transactions')
 @UseGuards(JwtAuthGuard)
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
 
   @Post()
-  create(@Body() createTransactionDto: CreateTransactionDto, @Request() req) {
+  create(
+    @Body() createTransactionDto: CreateTransactionDto,
+    @Request() req: RequestWithUser,
+  ) {
     return this.transactionService.create(createTransactionDto, req.user.id);
   }
 

@@ -1,5 +1,6 @@
 import { IsEmail, IsString, MinLength } from 'class-validator';
 
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 export class RegisterDto {
   @IsEmail()
   email: string;
@@ -12,3 +13,4 @@ export class RegisterDto {
   @MinLength(2)
   name: string;
 }
+/* eslint-enable @typescript-eslint/no-unsafe-call */

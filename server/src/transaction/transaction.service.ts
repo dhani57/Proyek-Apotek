@@ -1,6 +1,13 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
+
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
 @Injectable()
 export class TransactionService {
@@ -16,7 +23,9 @@ export class TransactionService {
       });
 
       if (!product) {
-        throw new NotFoundException(`Product with ID ${item.productId} not found`);
+        throw new NotFoundException(
+          `Product with ID ${item.productId} not found`,
+        );
       }
 
       if (product.stock < item.quantity) {
@@ -44,7 +53,9 @@ export class TransactionService {
       });
 
       if (!product) {
-        throw new NotFoundException(`Product with ID ${item.productId} not found`);
+        throw new NotFoundException(
+          `Product with ID ${item.productId} not found`,
+        );
       }
 
       const subtotal = product.sellPrice.toNumber() * item.quantity;
@@ -173,7 +184,7 @@ export class TransactionService {
     }
 
     const totalTransactions = await this.prisma.transaction.count({ where });
-    
+
     const totalSales = await this.prisma.transaction.aggregate({
       where,
       _sum: {

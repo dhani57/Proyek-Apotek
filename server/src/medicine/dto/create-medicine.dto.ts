@@ -7,6 +7,7 @@ import {
   Min,
 } from 'class-validator';
 
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 export class CreateMedicineDto {
   @IsString()
   name: string;

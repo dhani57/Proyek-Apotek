@@ -44,14 +44,18 @@ export class MedicineController {
   @UseGuards(RolesGuard)
   @Roles('ADMIN')
   getLowStock(@Query('threshold') threshold?: string) {
-    return this.medicineService.getLowStock(threshold ? parseInt(threshold) : 10);
+    return this.medicineService.getLowStock(
+      threshold ? parseInt(threshold) : 10,
+    );
   }
 
   @Get('expiring')
   @UseGuards(RolesGuard)
   @Roles('ADMIN')
   getExpiringMedicines(@Query('months') months?: string) {
-    return this.medicineService.getExpiringMedicines(months ? parseInt(months) : 3);
+    return this.medicineService.getExpiringMedicines(
+      months ? parseInt(months) : 3,
+    );
   }
 
   @Get(':id')
@@ -62,7 +66,10 @@ export class MedicineController {
   @Patch(':id')
   @UseGuards(RolesGuard)
   @Roles('ADMIN')
-  update(@Param('id') id: string, @Body() updateMedicineDto: UpdateMedicineDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateMedicineDto: UpdateMedicineDto,
+  ) {
     return this.medicineService.update(id, updateMedicineDto);
   }
 

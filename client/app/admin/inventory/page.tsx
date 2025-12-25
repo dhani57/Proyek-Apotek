@@ -24,15 +24,21 @@ interface Medicine {
   isActive: boolean;
 }
 
+interface ImportRow {
+  [key: string]: string | number | undefined;
+}
+
 function InventoryPage() {
   const [medicines, setMedicines] = useState<Medicine[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
   const [editingMedicine, setEditingMedicine] = useState<Medicine | null>(null);
   const [importFile, setImportFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -150,7 +156,7 @@ function InventoryPage() {
     }
   };
 
-  const parseFile = async (file: File): Promise<any[]> => {
+  const parseFile = async (file: File): Promise<ImportRow[]> => {
     const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
     
     if (fileExtension === '.csv') {
@@ -164,7 +170,7 @@ function InventoryPage() {
             const data = new Uint8Array(e.target?.result as ArrayBuffer);
             const workbook = XLSX.read(data, { type: 'array' });
             const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-            const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+            const jsonData = XLSX.utils.sheet_to_json(firstSheet) as ImportRow[];
             resolve(jsonData);
           } catch (error) {
             reject(error);
@@ -176,16 +182,16 @@ function InventoryPage() {
     }
   };
 
-  const parseCSV = (text: string): any[] => {
+  const parseCSV = (text: string): ImportRow[] => {
     const lines = text.split('\n').filter(line => line.trim());
     if (lines.length < 2) return [];
 
     const headers = lines[0].split(',').map(h => h.trim());
-    const data = [];
+    const data: ImportRow[] = [];
 
     for (let i = 1; i < lines.length; i++) {
       const values = lines[i].split(',').map(v => v.trim());
-      const obj: any = {};
+      const obj: ImportRow = {};
       headers.forEach((header, index) => {
         obj[header] = values[index];
       });
@@ -207,27 +213,27 @@ function InventoryPage() {
       const parsedData = await parseFile(importFile);
 
       // Transform data to match API format (support 18 columns)
-      const medicines = parsedData.map((row: any) => ({
-        plu: row.PLU || row.plu || '',
-        name: row['Item Name'] || row.name || row.Name || '',
-        description: row.description || row.Description || '',
-        purchasePrice: parseFloat(row['Purchase Price'] || row.purchasePrice || row.purchase_price || '0'),
-        sellPrice: parseFloat(row['Sales Price'] || row.sellPrice || row.sell_price || '0'),
-        buyPrice: parseFloat(row['Purchase Price'] || row.purchasePrice || row.buyPrice || row.buy_price || '0'),
-        stock: parseInt(row.Stock || row.stock || '0'),
-        stockMinimal: parseInt(row['Stock Minimal'] || row.stockMinimal || row.stock_minimal || '0'),
-        stockMaximal: parseInt(row['Stock Maximal'] || row.stockMaximal || row.stock_maximal || '0') || undefined,
-        unit: row['Unit Code'] || row.unit || row.Unit || 'tablet',
-        unitCode: row['Unit Code'] || row.unitCode || row.unit_code || '',
-        purchaseUnitCode: row['Purchase Unit Code'] || row.purchaseUnitCode || row.purchase_unit_code || '',
-        unitConversion: parseFloat(row['Unit Conversion'] || row.unitConversion || row.unit_conversion || '1'),
-        status: row.Status || row.status || 'active',
-        rackLocation: row['Rack Location'] || row.rackLocation || row.rack_location || '',
-        margin: parseFloat(row.Margin || row.margin || '0'),
-        onlineSku: row['Online SKU'] || row.onlineSku || row.online_sku || '',
-        barcode: row.Barcode || row.barcode || '',
-        categoryId: row.categoryId || row.category_id || row['Category ID'] || '',
-        supplierId: row.supplierId || row.supplier_id || row['Supplier ID'] || undefined,
+      const medicines = parsedData.map((row: ImportRow) => ({
+        plu: String(row.PLU || row.plu || ''),
+        name: String(row['Item Name'] || row.name || row.Name || ''),
+        description: String(row.description || row.Description || ''),
+        purchasePrice: parseFloat(String(row['Purchase Price'] || row.purchasePrice || row.purchase_price || '0')),
+        sellPrice: parseFloat(String(row['Sales Price'] || row.sellPrice || row.sell_price || '0')),
+        buyPrice: parseFloat(String(row['Purchase Price'] || row.purchasePrice || row.buyPrice || row.buy_price || '0')),
+        stock: parseInt(String(row.Stock || row.stock || '0')),
+        stockMinimal: parseInt(String(row['Stock Minimal'] || row.stockMinimal || row.stock_minimal || '0')),
+        stockMaximal: parseInt(String(row['Stock Maximal'] || row.stockMaximal || row.stock_maximal || '0')) || undefined,
+        unit: String(row['Unit Code'] || row.unit || row.Unit || 'tablet'),
+        unitCode: String(row['Unit Code'] || row.unitCode || row.unit_code || ''),
+        purchaseUnitCode: String(row['Purchase Unit Code'] || row.purchaseUnitCode || row.purchase_unit_code || ''),
+        unitConversion: parseFloat(String(row['Unit Conversion'] || row.unitConversion || row.unit_conversion || '1')),
+        status: String(row.Status || row.status || 'active'),
+        rackLocation: String(row['Rack Location'] || row.rackLocation || row.rack_location || ''),
+        margin: parseFloat(String(row.Margin || row.margin || '0')),
+        onlineSku: String(row['Online SKU'] || row.onlineSku || row.online_sku || ''),
+        barcode: String(row.Barcode || row.barcode || ''),
+        categoryId: String(row.categoryId || row.category_id || row['Category ID'] || ''),
+        supplierId: row.supplierId || row.supplier_id || row['Supplier ID'] ? String(row.supplierId || row.supplier_id || row['Supplier ID']) : undefined,
       }));
 
       // Call bulk import API
@@ -260,34 +266,13 @@ function InventoryPage() {
       setImporting(false);
     }
   };
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        alert(`Import successful!\nSuccess: ${result.success.length}\nFailed: ${result.failed.length}`);
-        setShowImportModal(false);
-        setImportFile(null);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-        }
-        loadMedicines();
-      } else {
-        throw new Error('Import failed');
-      }
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to import CSV';
-      alert(errorMessage);
-    } finally {
-      setImporting(false);
-    }
-  };
 
   const downloadTemplate = () => {
-    // Template dengan 18 kolom sesuai gambar
+    // Template sesuai format data existing dari apotek
     const template = 'No,PLU,Item Name,Purchase Price,Sales Price,Stock,Stock Minimal,Stock Maximal,Unit Code,Purchase Unit Code,Unit Conversion,Status,Rack Location,Margin,Online SKU,Barcode,Category,Supplier\n' +
-      '1,PLU001,Paracetamol 500mg,3000,5000,100,10,500,tablet,box,10,active,A1-01,2000,SKU001,8991234567890,category-id-here,supplier-id-here\n' +
-      '2,PLU002,Amoxicillin 500mg,10000,15000,50,5,200,capsule,box,10,active,A1-02,5000,SKU002,8991234567891,category-id-here,supplier-id-here';
+      '1,701570,POT PLASTIK 50 CC,8000,10000,500,10,1000,POT,BOX,50,Aktif,WADAH,2000,DEX1PT10-0,701570,category-id-here,supplier-id-here\n' +
+      '2,PP0001,POT PLASTIK 65 CC,8000,10000,500,10,1000,POT,BOX,50,Aktif,WADAH,2000,,PP0001,category-id-here,supplier-id-here\n' +
+      '3,BTL001,BOTOL KOSONG PLASTIK 30 ML,7000,10000,500,10,1000,BTL,BOX,30,Aktif,WADAH,3000,BTL001,,category-id-here,supplier-id-here';
     
     const blob = new Blob([template], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
@@ -301,45 +286,65 @@ function InventoryPage() {
   };
 
   const downloadTemplateExcel = () => {
-    // Create Excel template with 18 columns
+    // Template sesuai format data existing dari apotek
     const templateData = [
       {
         'No': 1,
-        'PLU': 'PLU001',
-        'Item Name': 'Paracetamol 500mg',
-        'Purchase Price': 3000,
-        'Sales Price': 5000,
-        'Stock': 100,
+        'PLU': '701570',
+        'Item Name': 'POT PLASTIK 50 CC',
+        'Purchase Price': 8000,
+        'Sales Price': 10000,
+        'Stock': 500,
         'Stock Minimal': 10,
-        'Stock Maximal': 500,
-        'Unit Code': 'tablet',
-        'Purchase Unit Code': 'box',
-        'Unit Conversion': 10,
-        'Status': 'active',
-        'Rack Location': 'A1-01',
+        'Stock Maximal': 1000,
+        'Unit Code': 'POT',
+        'Purchase Unit Code': 'BOX',
+        'Unit Conversion': 50,
+        'Status': 'Aktif',
+        'Rack Location': 'WADAH',
         'Margin': 2000,
-        'Online SKU': 'SKU001',
-        'Barcode': '8991234567890',
+        'Online SKU': 'DEX1PT10-0',
+        'Barcode': '701570',
         'Category': 'category-id-here',
         'Supplier': 'supplier-id-here'
       },
       {
         'No': 2,
-        'PLU': 'PLU002',
-        'Item Name': 'Amoxicillin 500mg',
-        'Purchase Price': 10000,
-        'Sales Price': 15000,
-        'Stock': 50,
-        'Stock Minimal': 5,
-        'Stock Maximal': 200,
-        'Unit Code': 'capsule',
-        'Purchase Unit Code': 'box',
-        'Unit Conversion': 10,
-        'Status': 'active',
-        'Rack Location': 'A1-02',
-        'Margin': 5000,
-        'Online SKU': 'SKU002',
-        'Barcode': '8991234567891',
+        'PLU': 'PP0001',
+        'Item Name': 'POT PLASTIK 65 CC',
+        'Purchase Price': 8000,
+        'Sales Price': 10000,
+        'Stock': 500,
+        'Stock Minimal': 10,
+        'Stock Maximal': 1000,
+        'Unit Code': 'POT',
+        'Purchase Unit Code': 'BOX',
+        'Unit Conversion': 50,
+        'Status': 'Aktif',
+        'Rack Location': 'WADAH',
+        'Margin': 2000,
+        'Online SKU': '',
+        'Barcode': 'PP0001',
+        'Category': 'category-id-here',
+        'Supplier': 'supplier-id-here'
+      },
+      {
+        'No': 3,
+        'PLU': 'BTL001',
+        'Item Name': 'BOTOL KOSONG PLASTIK 30 ML',
+        'Purchase Price': 7000,
+        'Sales Price': 10000,
+        'Stock': 500,
+        'Stock Minimal': 10,
+        'Stock Maximal': 1000,
+        'Unit Code': 'BTL',
+        'Purchase Unit Code': 'BOX',
+        'Unit Conversion': 30,
+        'Status': 'Aktif',
+        'Rack Location': 'WADAH',
+        'Margin': 3000,
+        'Online SKU': 'BTL001',
+        'Barcode': '',
         'Category': 'category-id-here',
         'Supplier': 'supplier-id-here'
       }
@@ -351,9 +356,11 @@ function InventoryPage() {
     XLSX.writeFile(workbook, 'medicine_import_template.xlsx');
   };
 
-  const handleExportCSV = async () => {
+  const handleExport = async (format: 'csv' | 'excel') => {
+    setExporting(true);
     try {
-      const response = await fetch('http://localhost:3000/medicines/export/csv', {
+      const endpoint = format === 'csv' ? 'csv' : 'excel';
+      const response = await fetch(`http://localhost:3000/medicines/export/${endpoint}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
@@ -365,39 +372,18 @@ function InventoryPage() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `medicines_export_${new Date().toISOString().split('T')[0]}.csv`;
+      const extension = format === 'csv' ? 'csv' : 'xlsx';
+      a.download = `medicines_export_${new Date().toISOString().split('T')[0]}.${extension}`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
+      setShowExportModal(false);
     } catch (error) {
       console.error('Export failed:', error);
       alert('Failed to export data');
-    }
-  };
-
-  const handleExportExcel = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/medicines/export/excel', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      if (!response.ok) throw new Error('Export failed');
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `medicines_export_${new Date().toISOString().split('T')[0]}.xlsx`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Export failed:', error);
-      alert('Failed to export data');
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -425,18 +411,11 @@ function InventoryPage() {
           <h1 className="text-2xl font-bold text-gray-800">Inventory Management</h1>
           <div className="flex gap-3">
             <button
-              onClick={handleExportCSV}
+              onClick={() => setShowExportModal(true)}
               className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
               <Download className="h-5 w-5" />
-              Export CSV
-            </button>
-            <button
-              onClick={handleExportExcel}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-            >
-              <FileSpreadsheet className="h-5 w-5" />
-              Export Excel
+              Export Data
             </button>
             <button
               onClick={handleImportClick}
@@ -803,8 +782,63 @@ function InventoryPage() {
           </div>
         </div>
       )}
+
+      {/* Export Modal */}
+      {showExportModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full">
+            <div className="flex justify-between items-center p-6 border-b">
+              <h2 className="text-xl font-bold text-gray-800">Export Medicines Data</h2>
+              <button onClick={() => setShowExportModal(false)}>
+                <X className="h-6 w-6 text-gray-600" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <p className="text-sm text-gray-600 mb-4">
+                Pilih format file untuk export semua data obat:
+              </p>
+
+              <button
+                onClick={() => handleExport('csv')}
+                disabled={exporting}
+                className="w-full flex items-center justify-between px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <div className="flex items-center gap-3">
+                  <Download className="h-6 w-6 text-green-600" />
+                  <div className="text-left">
+                    <div className="font-semibold text-gray-800">Export ke CSV</div>
+                    <div className="text-xs text-gray-500">Format: .csv (Excel compatible)</div>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => handleExport('excel')}
+                disabled={exporting}
+                className="w-full flex items-center justify-between px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <div className="flex items-center gap-3">
+                  <FileSpreadsheet className="h-6 w-6 text-green-600" />
+                  <div className="text-left">
+                    <div className="font-semibold text-gray-800">Export ke Excel</div>
+                    <div className="text-xs text-gray-500">Format: .xlsx (Microsoft Excel)</div>
+                  </div>
+                </div>
+              </button>
+
+              {exporting && (
+                <div className="text-center text-sm text-gray-600">
+                  Sedang mengexport data...
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }
 
 export default withAdminAuth(InventoryPage);
+

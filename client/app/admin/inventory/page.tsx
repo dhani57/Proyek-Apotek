@@ -58,10 +58,13 @@ function InventoryPage() {
 
   const loadMedicines = async () => {
     try {
+      setLoading(true);
       const data = await medicineApi.getAll();
       setMedicines(data);
     } catch (error: unknown) {
       console.error('Failed to load medicines:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load medicines';
+      alert(`Error: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -250,10 +253,26 @@ function InventoryPage() {
         body: JSON.stringify({ medicines }),
       });
 
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Import failed' }));
+        throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
       const result = await response.json();
 
-      if (response.ok) {
-        alert(`Import successful!\nSuccess: ${result.success.length}\nFailed: ${result.failed.length}`);
+      if (result.success && Array.isArray(result.success)) {
+        const successCount = result.success.length;
+        const failedCount = result.failed?.length || 0;
+        
+        let message = `Import completed!\n✓ Success: ${successCount} items`;
+        if (failedCount > 0) {
+          message += `\n✗ Failed: ${failedCount} items`;
+          if (result.failed[0]?.error) {
+            message += `\n\nFirst error: ${result.failed[0].error}`;
+          }
+        }
+        
+        alert(message);
         setShowImportModal(false);
         setImportFile(null);
         if (fileInputRef.current) {
@@ -261,11 +280,19 @@ function InventoryPage() {
         }
         loadMedicines();
       } else {
-        throw new Error('Import failed');
+        throw new Error('Unexpected response format from server');
       }
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to import file';
-      alert(errorMessage);
+      console.error('Import error:', error);
+      let errorMessage = 'Failed to import file';
+      
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        errorMessage = 'Cannot connect to server. Please ensure the server is running at http://localhost:3000';
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      alert(`Import Error:\n${errorMessage}`);
     } finally {
       setImporting(false);
     }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -21,19 +21,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  // Lazy initialization untuk menghindari cascading renders
-  const [user] = useState<{
+  const [user, setUser] = useState<{
     id: string;
     email: string;
     name: string;
     role: string;
-  } | null>(() => {
-    // Check if window is defined (client-side only)
-    if (typeof window !== 'undefined') {
-      return getUser();
-    }
-    return null;
-  });
+  } | null>(null);
+
+  // Load user data on client side only
+  useEffect(() => {
+    const userData = getUser();
+    setUser(userData);
+  }, []);
 
   const handleLogout = () => {
     removeAuthToken();
@@ -160,9 +159,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </nav>
 
           <div className="p-4 border-t border-emerald-700">
-            <div className="px-4 py-2 mb-2 text-sm text-emerald-100">
-              <p className="font-medium">{user?.name}</p>
-              <p className="text-xs">{user?.email}</p>
+            <div className="px-4 py-2 mb-2 text-sm text-emerald-100" suppressHydrationWarning>
+              <p className="font-medium">{user?.name || 'Loading...'}</p>
+              <p className="text-xs">{user?.email || ''}</p>
             </div>
             <button
               onClick={handleLogout}

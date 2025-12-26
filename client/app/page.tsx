@@ -62,8 +62,8 @@ export default function CustomerPage() {
 
   const filteredMedicines = Array.isArray(medicines) ? medicines.filter((medicine) => {
     const matchesSearch =
-      medicine.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      medicine.genericName.toLowerCase().includes(searchQuery.toLowerCase());
+      medicine.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      medicine.genericName?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory =
       selectedCategory === 'all' || medicine.categoryId === selectedCategory;
     return matchesSearch && matchesCategory && medicine.stock > 0;

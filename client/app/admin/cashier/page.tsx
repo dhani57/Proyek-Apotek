@@ -16,20 +16,36 @@ import { medicineApi, transactionApi } from '@/lib/api';
 interface Medicine {
   id: string;
   name: string;
+  description?: string;
+  sellPrice: number;
+  buyPrice: number;
+  stock: number;
+  unit: string;
+  batchNumber?: string;
+  expirationDate?: string;
+  category?: {
+    id: string;
+    name: string;
+  };
+  isActive: boolean;
+}
+
+interface MedicineDisplay {
+  id: string;
+  name: string;
   genericName: string;
-  categoryId: string;
   price: number;
   stock: number;
   batchNumber: string;
   expiryDate: string;
 }
 
-interface CartItem extends Medicine {
+interface CartItem extends MedicineDisplay {
   quantity: number;
 }
 
 function CashierPage() {
-  const [medicines, setMedicines] = useState<Medicine[]>([]);
+  const [medicines, setMedicines] = useState<MedicineDisplay[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -42,8 +58,18 @@ function CashierPage() {
   const loadMedicines = async () => {
     try {
       setLoading(true);
-      const data = await medicineApi.getAll();
-      setMedicines(data);
+      const data: Medicine[] = await medicineApi.getAll();
+      // Transform API data to display format
+      const displayData: MedicineDisplay[] = data.map(med => ({
+        id: med.id,
+        name: med.name,
+        genericName: med.description || med.name,
+        price: med.sellPrice,
+        stock: med.stock,
+        batchNumber: med.batchNumber || 'N/A',
+        expiryDate: med.expirationDate || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+      }));
+      setMedicines(displayData);
     } catch (error) {
       console.error('Failed to load medicines:', error);
       alert('Gagal memuat data obat');
@@ -59,7 +85,7 @@ function CashierPage() {
       med.batchNumber.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const addToCart = (medicine: Medicine) => {
+  const addToCart = (medicine: MedicineDisplay) => {
     const existingItem = cart.find((item) => item.id === medicine.id);
 
     if (existingItem) {

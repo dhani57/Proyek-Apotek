@@ -12,7 +12,7 @@ async function bootstrap() {
   
   // Enable CORS for Next.js frontend
   app.enableCors({
-    origin: 'http://localhost:3000', // Next.js frontend
+    origin: 'http://localhost:3001', // Next.js frontend
     credentials: true,
   });
   
@@ -22,6 +22,6 @@ async function bootstrap() {
     transform: true,
   }));
   
-  await app.listen(process.env.PORT ?? 3001);
+  await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

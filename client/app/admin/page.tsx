@@ -168,7 +168,7 @@ function AdminDashboard() {
                           <div key={index} className="flex-1 flex flex-col items-center gap-2">
                             <div className="w-full bg-gray-100 rounded-t-lg relative group">
                               <div
-                                className="w-full bg-gradient-to-t from-emerald-600 to-emerald-400 rounded-t-lg transition-all duration-300 hover:from-emerald-700 hover:to-emerald-500 min-h-[20px]"
+                                className="w-full bg-gradient-to-t from-emerald-600 to-emerald-400 rounded-t-lg transition-all duration-300 hover:from-emerald-700 hover:to-emerald-500 min-h-5"
                                 style={{ height: `${Math.max(heightPercent, 10)}%` }}
                               >
                                 <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">

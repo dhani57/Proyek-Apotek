@@ -211,7 +211,7 @@ function CashierPage() {
                 </div>
               </div>
 
-              <div className="p-4 max-h-[600px] overflow-y-auto">
+              <div className="p-4 max-h-150 overflow-y-auto">
                 {loading ? (
                   <div className="flex items-center justify-center h-64">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
@@ -291,7 +291,7 @@ function CashierPage() {
                 </div>
               </div>
 
-              <div className="p-4 max-h-[400px] overflow-y-auto">
+              <div className="p-4 max-h-100 overflow-y-auto">
                 {cart.length === 0 ? (
                   <div className="text-center py-12">
                     <ShoppingCart className="h-12 w-12 text-gray-400 mx-auto mb-3" />

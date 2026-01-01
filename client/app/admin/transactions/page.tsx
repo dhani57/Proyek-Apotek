@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Printer } from 'lucide-react';
 import { withAdminAuth } from '@/components/withAdminAuth';
 import AdminLayout from '@/components/AdminLayout';
 import { transactionApi } from '@/lib/api';
@@ -82,6 +82,231 @@ function TransactionsPage() {
       hour: '2-digit',
       minute: '2-digit',
     });
+  };
+
+  const printReceipt = (transaction: Transaction) => {
+    const printWindow = window.open('', '', 'width=400,height=600');
+    if (!printWindow) return;
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Struk - Apotek B213</title>
+          <style>
+            * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
+            
+            body {
+              font-family: 'Courier New', monospace;
+              padding: 5mm;
+              background: white;
+            }
+            
+            .receipt {
+              width: 58mm;
+              margin: 0 auto;
+              background: white;
+              font-size: 9px;
+            }
+            
+            .receipt-header {
+              text-align: center;
+              border-bottom: 1px dashed #000;
+              padding-bottom: 6px;
+              margin-bottom: 6px;
+            }
+            
+            .store-name {
+              font-size: 14px;
+              font-weight: bold;
+              margin-bottom: 2px;
+            }
+            
+            .store-info {
+              font-size: 8px;
+              line-height: 1.3;
+            }
+            
+            .receipt-info {
+              font-size: 8px;
+              margin-bottom: 6px;
+              padding-bottom: 6px;
+              border-bottom: 1px dashed #000;
+            }
+            
+            .info-row {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 2px;
+            }
+            
+            .items-table {
+              width: 100%;
+              font-size: 8px;
+              margin-bottom: 6px;
+              border-bottom: 1px dashed #000;
+              padding-bottom: 6px;
+            }
+            
+            .item-row {
+              margin-bottom: 5px;
+              padding-bottom: 5px;
+              border-bottom: 1px dotted #ccc;
+            }
+            
+            .item-row:last-child {
+              border-bottom: none;
+            }
+            
+            .item-name {
+              font-weight: bold;
+              margin-bottom: 2px;
+              font-size: 9px;
+            }
+            
+            .item-details {
+              display: flex;
+              justify-content: space-between;
+              font-size: 8px;
+            }
+            
+            .receipt-summary {
+              padding-top: 5px;
+              margin-top: 6px;
+              font-size: 8px;
+            }
+            
+            .summary-row {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 3px;
+            }
+            
+            .total-row {
+              font-size: 11px;
+              font-weight: bold;
+              padding-top: 5px;
+              border-top: 1px dashed #000;
+              margin-top: 5px;
+            }
+            
+            .receipt-footer {
+              text-align: center;
+              font-size: 8px;
+              margin-top: 8px;
+              padding-top: 6px;
+              border-top: 1px dashed #000;
+            }
+            
+            .footer-text {
+              margin: 2px 0;
+            }
+            
+            @media print {
+              body {
+                padding: 0;
+              }
+              
+              .receipt {
+                width: 58mm;
+              }
+              
+              @page {
+                size: 58mm auto;
+                margin: 0;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="receipt">
+            <div class="receipt-header">
+              <div class="store-name">APOTEK B213</div>
+              <div class="store-info">
+                Jl. Kesehatan No. 213<br />
+                Jakarta Selatan 12345<br />
+                Telp: +62 21 1234 5678<br />
+                info@apotekb213.com
+              </div>
+            </div>
+
+            <div class="receipt-info">
+              <div class="info-row">
+                <span>No. Transaksi:</span>
+                <span><strong>${transaction.transactionNo}</strong></span>
+              </div>
+              <div class="info-row">
+                <span>Tanggal:</span>
+                <span>${formatDate(transaction.createdAt)}</span>
+              </div>
+              <div class="info-row">
+                <span>Kasir:</span>
+                <span>${transaction.cashier.name}</span>
+              </div>
+              <div class="info-row">
+                <span>Pembayaran:</span>
+                <span>${transaction.paymentMethod}</span>
+              </div>
+            </div>
+
+            <div class="items-table">
+              ${transaction.items.map(item => `
+                <div class="item-row">
+                  <div class="item-name">${item.product.name}</div>
+                  <div class="item-details">
+                    <span>${item.quantity} x ${formatCurrency(item.price)}</span>
+                    <span><strong>${formatCurrency(item.subtotal)}</strong></span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="receipt-summary">
+              <div class="summary-row">
+                <span>Subtotal:</span>
+                <span>${formatCurrency(transaction.totalPrice)}</span>
+              </div>
+              <div class="summary-row">
+                <span>Diskon:</span>
+                <span>-</span>
+              </div>
+              <div class="summary-row">
+                <span>Pajak:</span>
+                <span>-</span>
+              </div>
+              <div class="summary-row total-row">
+                <span>TOTAL:</span>
+                <span>${formatCurrency(transaction.totalPrice)}</span>
+              </div>
+            </div>
+
+            <div class="receipt-footer">
+              <div class="footer-text">
+                <strong>Terima kasih!</strong>
+              </div>
+              <div class="footer-text" style="font-size: 7px;">
+                Barang yang sudah dibeli<br/>tidak dapat dikembalikan
+              </div>
+              <div class="footer-text" style="margin-top: 4px; font-size: 7px;">
+                www.apotekb213.com
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.focus();
+    
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 250);
   };
 
   return (
@@ -202,6 +427,23 @@ function TransactionsPage() {
                           {transaction.status}
                         </span>
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => printReceipt(transaction)}
+                            className="p-2 bg-emerald-100 text-emerald-600 hover:bg-emerald-200 rounded-lg transition-colors"
+                            title="Cetak Struk"
+                          >
+                            <Printer className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => setSelectedTransaction(transaction)}
+                            className="px-3 py-1 bg-blue-100 text-blue-600 hover:bg-blue-200 rounded-lg transition-colors text-xs font-medium"
+                          >
+                            Detail
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -269,6 +511,22 @@ function TransactionsPage() {
                   <span>Payment Method</span>
                   <span className="font-medium">{selectedTransaction.paymentMethod}</span>
                 </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => printReceipt(selectedTransaction)}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition-colors"
+                >
+                  <Printer className="h-5 w-5" />
+                  Cetak Struk
+                </button>
+                <button
+                  onClick={() => setSelectedTransaction(null)}
+                  className="flex-1 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition-colors"
+                >
+                  Tutup
+                </button>
               </div>
             </div>
           </div>

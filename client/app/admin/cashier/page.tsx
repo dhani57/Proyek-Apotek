@@ -52,8 +52,6 @@ function CashierPage() {
   const [loading, setLoading] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
   const [showPaymentConfirm, setShowPaymentConfirm] = useState(false);
-  const [showReceipt, setShowReceipt] = useState(false);
-  const [lastTransaction, setLastTransaction] = useState<any>(null);
 
   useEffect(() => {
     loadMedicines();
@@ -167,17 +165,7 @@ function CashierPage() {
 
       const result = await transactionApi.create(transactionData);
 
-      // Save transaction data for receipt
-      setLastTransaction({
-        id: result.id || new Date().getTime().toString(),
-        date: new Date().toISOString(),
-        items: cart,
-        total: calculateTotal(),
-        paymentMethod: paymentMethod,
-      });
-
-      // Show receipt
-      setShowReceipt(true);
+      // Close modal and reset
       setShowPaymentConfirm(false);
       setCart([]);
       loadMedicines(); // Refresh stock
@@ -195,7 +183,6 @@ function CashierPage() {
 
   const handleCancelPayment = () => {
     setShowPaymentConfirm(false);
-    setShowReceipt(false);
   };
 
   const formatCurrency = (amount: number) => {
@@ -411,16 +398,13 @@ function CashierPage() {
         </div>
       </div>
 
-      {/* Payment Confirmation & Receipt Modal */}
-      {(showPaymentConfirm || showReceipt) && (
+      {/* Payment Confirmation Modal */}
+      {showPaymentConfirm && (
         <Receipt
           items={cart}
           total={calculateTotal()}
           onConfirm={handlePaymentConfirm}
           onCancel={handleCancelPayment}
-          showReceipt={showReceipt}
-          transactionId={lastTransaction?.id}
-          transactionDate={lastTransaction?.date}
         />
       )}
     </AdminLayout>

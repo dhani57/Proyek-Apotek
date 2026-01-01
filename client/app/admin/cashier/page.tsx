@@ -51,6 +51,7 @@ function CashierPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
+  const [showPaymentConfirm, setShowPaymentConfirm] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
   const [lastTransaction, setLastTransaction] = useState<any>(null);
 
@@ -143,18 +144,16 @@ function CashierPage() {
     return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   };
 
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     if (cart.length === 0) {
       alert('Keranjang kosong!');
       return;
     }
+    // Show payment confirmation
+    setShowPaymentConfirm(true);
+  };
 
-    const confirmed = window.confirm(
-      `Total: ${formatCurrency(calculateTotal())}\nProses transaksi?`
-    );
-
-    if (!confirmed) return;
-
+  const handlePaymentConfirm = async (paymentMethod: 'CASH' | 'QRIS') => {
     try {
       setProcessingPayment(true);
 
@@ -163,7 +162,7 @@ function CashierPage() {
           productId: item.id,
           quantity: String(item.quantity), // Convert to string as required by API
         })),
-        paymentMethod: 'CASH',
+        paymentMethod: paymentMethod,
       };
 
       const result = await transactionApi.create(transactionData);
@@ -174,22 +173,29 @@ function CashierPage() {
         date: new Date().toISOString(),
         items: cart,
         total: calculateTotal(),
-        paymentMethod: 'CASH',
+        paymentMethod: paymentMethod,
       });
 
       // Show receipt
       setShowReceipt(true);
+      setShowPaymentConfirm(false);
       setCart([]);
       loadMedicines(); // Refresh stock
     } catch (error) {
       console.error('Failed to process transaction:', error);
-      const errorMessage = error instanceof Error && 'response' in error 
-        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Gagal memproses transaksi'
+      const errorMessage = error instanceof Error 
+        ? error.message
         : 'Gagal memproses transaksi';
       alert(errorMessage);
+      setShowPaymentConfirm(false);
     } finally {
       setProcessingPayment(false);
     }
+  };
+
+  const handleCancelPayment = () => {
+    setShowPaymentConfirm(false);
+    setShowReceipt(false);
   };
 
   const formatCurrency = (amount: number) => {
@@ -405,11 +411,16 @@ function CashierPage() {
         </div>
       </div>
 
-      {/* Receipt Modal */}
-      {showReceipt && lastTransaction && (
+      {/* Payment Confirmation & Receipt Modal */}
+      {(showPaymentConfirm || showReceipt) && (
         <Receipt
-          transaction={lastTransaction}
-          onClose={() => setShowReceipt(false)}
+          items={cart}
+          total={calculateTotal()}
+          onConfirm={handlePaymentConfirm}
+          onCancel={handleCancelPayment}
+          showReceipt={showReceipt}
+          transactionId={lastTransaction?.id}
+          transactionDate={lastTransaction?.date}
         />
       )}
     </AdminLayout>

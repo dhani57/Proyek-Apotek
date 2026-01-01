@@ -1,11 +1,12 @@
-import { IsString, IsArray, ValidateNested, IsOptional } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsString, IsArray, ValidateNested, IsOptional, IsNumber } from 'class-validator';
+import { Type, Transform } from 'class-transformer';
 
 class TransactionItemDto {
   @IsString()
   productId: string;
 
-  @IsString()
+  @Transform(({ value }) => parseInt(value, 10))
+  @IsNumber()
   quantity: number;
 }
 

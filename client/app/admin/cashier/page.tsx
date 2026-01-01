@@ -12,6 +12,7 @@ import {
 import { withAdminAuth } from '@/components/withAdminAuth';
 import AdminLayout from '@/components/AdminLayout';
 import { medicineApi, transactionApi } from '@/lib/api';
+import Receipt from '@/components/Receipt';
 
 interface Medicine {
   id: string;
@@ -50,6 +51,8 @@ function CashierPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [lastTransaction, setLastTransaction] = useState<any>(null);
 
   useEffect(() => {
     loadMedicines();
@@ -158,14 +161,24 @@ function CashierPage() {
       const transactionData = {
         items: cart.map((item) => ({
           productId: item.id,
-          quantity: item.quantity,
+          quantity: String(item.quantity), // Convert to string as required by API
         })),
         paymentMethod: 'CASH',
       };
 
-      await transactionApi.create(transactionData);
+      const result = await transactionApi.create(transactionData);
 
-      alert('Transaksi berhasil!');
+      // Save transaction data for receipt
+      setLastTransaction({
+        id: result.id || new Date().getTime().toString(),
+        date: new Date().toISOString(),
+        items: cart,
+        total: calculateTotal(),
+        paymentMethod: 'CASH',
+      });
+
+      // Show receipt
+      setShowReceipt(true);
       setCart([]);
       loadMedicines(); // Refresh stock
     } catch (error) {
@@ -391,6 +404,14 @@ function CashierPage() {
           </div>
         </div>
       </div>
+
+      {/* Receipt Modal */}
+      {showReceipt && lastTransaction && (
+        <Receipt
+          transaction={lastTransaction}
+          onClose={() => setShowReceipt(false)}
+        />
+      )}
     </AdminLayout>
   );
 }

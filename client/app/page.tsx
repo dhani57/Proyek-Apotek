@@ -1,87 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, Pill, LogIn, Filter, ShieldCheck, Clock, Package, Sparkles } from 'lucide-react';
+import { Pill, LogIn, ShieldCheck, Clock, MapPin, Phone, Mail, Award, Users, Building2, Heart, Star, CheckCircle } from 'lucide-react';
 
-interface Medicine {
-  id: string;
-  name: string;
-  genericName: string;
-  categoryId: string;
-  category: {
-    id: string;
-    name: string;
-  };
-  price: number;
-  stock: number;
-  batchNumber: string;
-  expiryDate: string;
-}
-
-interface Category {
-  id: string;
-  name: string;
-  description?: string;
-}
-
-export default function CustomerPage() {
-  const [medicines, setMedicines] = useState<Medicine[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const [medicinesRes, categoriesRes] = await Promise.all([
-        fetch('http://localhost:3000/medicines'),
-        fetch('http://localhost:3000/categories'),
-      ]);
-
-      const medicinesData = await medicinesRes.json();
-      const categoriesData = await categoriesRes.json();
-
-      // Ensure medicinesData is an array
-      setMedicines(Array.isArray(medicinesData) ? medicinesData : []);
-      setCategories(Array.isArray(categoriesData) ? categoriesData : []);
-    } catch (error) {
-      console.error('Failed to load data:', error);
-      // Set empty arrays on error
-      setMedicines([]);
-      setCategories([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filteredMedicines = Array.isArray(medicines) ? medicines.filter((medicine) => {
-    const matchesSearch =
-      medicine.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      medicine.genericName?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory =
-      selectedCategory === 'all' || medicine.categoryId === selectedCategory;
-    return matchesSearch && matchesCategory && medicine.stock > 0;
-  }) : [];
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-    }).format(amount);
-  };
+export default function PharmacyProfilePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-emerald-50 to-teal-50">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-emerald-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+          <div className="flex items-center justify-center h-20">
             <div className="flex items-center gap-4">
               <div className="relative">
                 <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl blur opacity-30 animate-pulse"></div>
@@ -94,247 +23,320 @@ export default function CustomerPage() {
                   Apotek B213
                 </h1>
                 <p className="text-sm text-gray-600 font-medium flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 text-yellow-500" />
+                  <Heart className="w-3 h-3 text-red-500" />
                   Kesehatan Terpercaya Keluarga Indonesia
                 </p>
               </div>
             </div>
-
-            <Link
-              href="/login"
-              className="group relative px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-            >
-              <div className="flex items-center gap-2">
-                <LogIn className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
-                <span className="font-bold">Login Admin</span>
-              </div>
-            </Link>
           </div>
         </div>
       </header>
 
-      {/* Hero Section with Modern Design */}
+      {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600"></div>
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE0YzMuMzE0IDAgNi0yLjY4NiA2LTZzLTIuNjg2LTYtNi02LTYgMi42ODYtNiA2IDIuNjg2IDYgNiA2em0wIDJ2LTJhNiA2IDAgMTAwIDEyek0yNCA0NGMzLjMxNCAwIDYtMi42ODYgNi02cy0yLjY4Ni02LTYtNi02IDIuNjg2LTYgNiAyLjY4NiA2IDYgNnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30"></div>
         
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white mb-6 animate-bounce">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white mb-6">
               <ShieldCheck className="w-4 h-4" />
-              <span className="text-sm font-semibold">Terpercaya & Terjamin Kualitas</span>
+              <span className="text-sm font-semibold">Terpercaya Sejak 2010</span>
             </div>
             
-            <h2 className="text-5xl md:text-6xl font-black text-white mb-4 leading-tight">
-              Temukan Obat yang
+            <h2 className="text-5xl md:text-6xl font-black text-white mb-6 leading-tight">
+              Selamat Datang di
               <br />
               <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
-                Anda Butuhkan
+                Apotek B213
               </span>
             </h2>
-            <p className="text-xl text-emerald-50 mb-10 max-w-2xl mx-auto">
-              Koleksi lengkap obat berkualitas dengan harga terjangkau untuk kesehatan keluarga Anda
+            <p className="text-xl text-emerald-50 max-w-3xl mx-auto leading-relaxed">
+              Partner terpercaya kesehatan keluarga Indonesia dengan pelayanan profesional, 
+              produk berkualitas, dan harga terjangkau untuk semua kalangan.
             </p>
-
-            {/* Search Bar with Modern Design */}
-            <div className="max-w-3xl mx-auto">
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-2xl blur opacity-40 group-hover:opacity-60 transition duration-300"></div>
-                <div className="relative flex items-center">
-                  <Search className="absolute left-6 w-6 h-6 text-emerald-600 z-10" />
-                  <input
-                    type="text"
-                    placeholder="Ketik nama obat atau kandungan yang dicari..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-16 pr-6 py-5 rounded-2xl text-gray-800 text-lg font-medium focus:outline-none focus:ring-4 focus:ring-emerald-300 shadow-2xl"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Trust Badges */}
-          <div className="grid grid-cols-3 gap-6 max-w-3xl mx-auto mt-12">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center transform hover:scale-105 transition-transform duration-300">
-              <ShieldCheck className="w-8 h-8 text-white mx-auto mb-2" />
-              <p className="text-white font-bold text-sm">Obat Original</p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center transform hover:scale-105 transition-transform duration-300">
-              <Clock className="w-8 h-8 text-white mx-auto mb-2" />
-              <p className="text-white font-bold text-sm">Layanan Cepat</p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center transform hover:scale-105 transition-transform duration-300">
-              <Package className="w-8 h-8 text-white mx-auto mb-2" />
-              <p className="text-white font-bold text-sm">Stok Lengkap</p>
-            </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Category Filter with Pills Design */}
-        <div className="mb-12">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
-              <Filter className="w-5 h-5 text-white" />
-            </div>
-            <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-              Pilih Kategori
+        
+        {/* About Section */}
+        <section className="mb-16">
+          <div className="text-center mb-12">
+            <h3 className="text-4xl font-black bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-4">
+              Tentang Kami
             </h3>
-          </div>
-          
-          <div className="flex flex-wrap gap-3">
-            <button
-              onClick={() => setSelectedCategory('all')}
-              className={`group relative px-6 py-3 rounded-full font-bold transition-all duration-300 transform hover:scale-105 ${
-                selectedCategory === 'all'
-                  ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-300'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200 hover:border-emerald-300'
-              }`}
-            >
-              <span className="relative z-10">✨ Semua Obat</span>
-            </button>
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`group relative px-6 py-3 rounded-full font-bold transition-all duration-300 transform hover:scale-105 ${
-                  selectedCategory === category.id
-                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-300'
-                    : 'bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200 hover:border-emerald-300'
-                }`}
-              >
-                <span className="relative z-10">{category.name}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Results Counter */}
-        {!loading && (
-          <div className="mb-6 flex items-center justify-between">
-            <p className="text-gray-600">
-              Menampilkan <span className="font-bold text-emerald-600">{filteredMedicines.length}</span> obat
+            <p className="text-gray-600 text-lg max-w-3xl mx-auto">
+              Apotek B213 berdiri sejak tahun 2010 dengan komitmen memberikan layanan kesehatan terbaik 
+              untuk masyarakat Indonesia. Kami dipercaya oleh ribuan pelanggan di seluruh nusantara.
             </p>
           </div>
-        )}
 
-        {/* Medicine Grid with Premium Cards */}
-        {loading ? (
-          <div className="text-center py-20">
-            <div className="relative inline-block">
-              <div className="animate-spin rounded-full h-20 w-20 border-4 border-emerald-200"></div>
-              <div className="absolute top-0 left-0 animate-spin rounded-full h-20 w-20 border-4 border-emerald-600 border-t-transparent"></div>
-            </div>
-            <p className="mt-6 text-gray-600 font-medium text-lg">Memuat koleksi obat...</p>
-          </div>
-        ) : filteredMedicines.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="relative inline-block mb-6">
-              <div className="absolute -inset-2 bg-gradient-to-r from-pink-300 to-purple-300 rounded-full blur opacity-30"></div>
-              <div className="relative w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center">
-                <Pill className="w-12 h-12 text-purple-400" />
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-shadow duration-300 border border-emerald-100">
+              <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                <Award className="w-8 h-8 text-white" />
               </div>
+              <h4 className="text-xl font-bold text-gray-800 mb-3 text-center">Pengalaman 14+ Tahun</h4>
+              <p className="text-gray-600 text-center">
+                Melayani masyarakat dengan dedikasi tinggi dan profesionalitas yang teruji waktu.
+              </p>
             </div>
-            <h3 className="text-2xl font-bold text-gray-700 mb-2">Tidak ada obat ditemukan</h3>
-            <p className="text-gray-500 max-w-md mx-auto">
-              Coba ubah kata kunci pencarian atau pilih kategori lain untuk menemukan obat yang Anda butuhkan
+
+            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-shadow duration-300 border border-emerald-100">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                <Users className="w-8 h-8 text-white" />
+              </div>
+              <h4 className="text-xl font-bold text-gray-800 mb-3 text-center">10.000+ Pelanggan</h4>
+              <p className="text-gray-600 text-center">
+                Dipercaya oleh ribuan keluarga Indonesia untuk kebutuhan kesehatan mereka.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-shadow duration-300 border border-emerald-100">
+              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                <ShieldCheck className="w-8 h-8 text-white" />
+              </div>
+              <h4 className="text-xl font-bold text-gray-800 mb-3 text-center">100% Original</h4>
+              <p className="text-gray-600 text-center">
+                Semua produk dijamin keaslian dan kualitasnya langsung dari distributor resmi.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Services Section */}
+        <section className="mb-16">
+          <div className="text-center mb-12">
+            <h3 className="text-4xl font-black bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-4">
+              Layanan Kami
+            </h3>
+            <p className="text-gray-600 text-lg max-w-3xl mx-auto">
+              Kami menyediakan berbagai layanan kesehatan yang lengkap untuk memenuhi kebutuhan Anda.
             </p>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredMedicines.map((medicine) => (
-              <div
-                key={medicine.id}
-                className="group relative bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-105 border border-gray-100"
-              >
-                {/* Card Header with Gradient */}
-                <div className="h-2 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500"></div>
-                
-                {/* Category Badge */}
-                <div className="absolute top-4 right-4 z-10">
-                  <span className="px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold rounded-full shadow-lg">
-                    {medicine.category.name}
-                  </span>
-                </div>
 
-                <div className="p-6">
-                  {/* Medicine Icon */}
-                  <div className="w-16 h-16 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <Pill className="w-8 h-8 text-emerald-600" />
-                  </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 border-2 border-emerald-200 hover:border-emerald-400 transition-colors duration-300">
+              <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center mb-4">
+                <Pill className="w-6 h-6 text-white" />
+              </div>
+              <h4 className="text-lg font-bold text-gray-800 mb-2">Obat Resep</h4>
+              <p className="text-gray-600 text-sm">Penebusan resep dokter dengan apoteker berpengalaman</p>
+            </div>
 
-                  {/* Medicine Name */}
-                  <h3 className="font-black text-gray-800 text-xl mb-2 group-hover:text-emerald-600 transition-colors">
-                    {medicine.name}
-                  </h3>
-                  <p className="text-sm text-gray-500 italic mb-4 line-clamp-2">
-                    {medicine.genericName}
-                  </p>
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border-2 border-purple-200 hover:border-purple-400 transition-colors duration-300">
+              <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center mb-4">
+                <Building2 className="w-6 h-6 text-white" />
+              </div>
+              <h4 className="text-lg font-bold text-gray-800 mb-2">Obat Bebas</h4>
+              <p className="text-gray-600 text-sm">Tersedia berbagai obat bebas dan bebas terbatas</p>
+            </div>
 
-                  {/* Price Tag */}
-                  <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4 mb-4">
-                    <p className="text-xs text-gray-600 mb-1">Harga</p>
-                    <p className="font-black text-2xl bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                      {formatCurrency(medicine.price)}
-                    </p>
-                  </div>
+            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-6 border-2 border-blue-200 hover:border-blue-400 transition-colors duration-300">
+              <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center mb-4">
+                <Heart className="w-6 h-6 text-white" />
+              </div>
+              <h4 className="text-lg font-bold text-gray-800 mb-2">Konsultasi</h4>
+              <p className="text-gray-600 text-sm">Konsultasi gratis dengan apoteker profesional</p>
+            </div>
 
-                  {/* Stock Info */}
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-sm font-medium text-gray-600">Ketersediaan</span>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className={`w-2 h-2 rounded-full ${
-                          medicine.stock < 10 ? 'bg-red-500 animate-pulse' : 'bg-green-500'
-                        }`}
-                      ></div>
-                      <span
-                        className={`font-bold text-sm ${
-                          medicine.stock < 10 ? 'text-red-600' : 'text-green-600'
-                        }`}
-                      >
-                        {medicine.stock} unit
-                      </span>
-                    </div>
-                  </div>
+            <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-6 border-2 border-orange-200 hover:border-orange-400 transition-colors duration-300">
+              <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center mb-4">
+                <Clock className="w-6 h-6 text-white" />
+              </div>
+              <h4 className="text-lg font-bold text-gray-800 mb-2">Layanan 24/7</h4>
+              <p className="text-gray-600 text-sm">Siap melayani Anda kapan saja dibutuhkan</p>
+            </div>
+          </div>
+        </section>
 
-                  {/* Batch & Expiry */}
-                  <div className="pt-4 border-t border-gray-100">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <p className="text-xs text-gray-500 mb-1">Batch</p>
-                        <p className="text-xs font-bold text-gray-700">{medicine.batchNumber}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 mb-1">Kadaluarsa</p>
-                        <p className="text-xs font-bold text-gray-700">
-                          {new Date(medicine.expiryDate).toLocaleDateString('id-ID', {
-                            month: 'short',
-                            year: 'numeric',
-                          })}
-                        </p>
-                      </div>
-                    </div>
+        {/* Why Choose Us */}
+        <section className="mb-16">
+          <div className="bg-gradient-to-br from-emerald-600 to-teal-600 rounded-3xl p-12 text-white relative overflow-hidden">
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE0YzMuMzE0IDAgNi0yLjY4NiA2LTZzLTIuNjg2LTYtNi02LTYgMi42ODYtNiA2IDIuNjg2IDYgNiA2em0wIDJ2LTJhNiA2IDAgMTAwIDEyek0yNCA0NGMzLjMxNCAwIDYtMi42ODYgNi02cy0yLjY4Ni02LTYtNi02IDIuNjg2LTYgNiAyLjY4NiA2IDYgNnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30"></div>
+            
+            <div className="relative">
+              <div className="text-center mb-10">
+                <h3 className="text-4xl font-black text-white mb-4">
+                  Mengapa Memilih Apotek B213?
+                </h3>
+                <p className="text-emerald-50 text-lg max-w-2xl mx-auto">
+                  Kami berkomitmen memberikan yang terbaik untuk kesehatan Anda dan keluarga
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                <div className="flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-6">
+                  <CheckCircle className="w-6 h-6 text-yellow-300 flex-shrink-0 mt-1" />
+                  <div>
+                    <h4 className="font-bold text-lg mb-2">Harga Terjangkau</h4>
+                    <p className="text-emerald-50">Kami menawarkan harga kompetitif tanpa mengurangi kualitas produk</p>
                   </div>
                 </div>
 
-                {/* Hover Effect Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-emerald-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                <div className="flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-6">
+                  <CheckCircle className="w-6 h-6 text-yellow-300 flex-shrink-0 mt-1" />
+                  <div>
+                    <h4 className="font-bold text-lg mb-2">Apoteker Profesional</h4>
+                    <p className="text-emerald-50">Tim apoteker bersertifikat siap membantu dan memberikan konsultasi</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-6">
+                  <CheckCircle className="w-6 h-6 text-yellow-300 flex-shrink-0 mt-1" />
+                  <div>
+                    <h4 className="font-bold text-lg mb-2">Stok Lengkap</h4>
+                    <p className="text-emerald-50">Ribuan jenis obat dan produk kesehatan selalu tersedia</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-6">
+                  <CheckCircle className="w-6 h-6 text-yellow-300 flex-shrink-0 mt-1" />
+                  <div>
+                    <h4 className="font-bold text-lg mb-2">Lokasi Strategis</h4>
+                    <p className="text-emerald-50">Mudah dijangkau dengan area parkir yang luas dan nyaman</p>
+                  </div>
+                </div>
               </div>
-            ))}
+            </div>
           </div>
-        )}
+        </section>
+
+        {/* Contact Information */}
+        <section className="mb-16">
+          <div className="text-center mb-12">
+            <h3 className="text-4xl font-black bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-4">
+              Hubungi Kami
+            </h3>
+            <p className="text-gray-600 text-lg">
+              Kami siap melayani Anda dengan sepenuh hati
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg">
+                <MapPin className="w-8 h-8 text-white" />
+              </div>
+              <h4 className="font-bold text-gray-800 mb-2">Alamat</h4>
+              <p className="text-gray-600">
+                Jl. Kesehatan No. 213<br />
+                Jakarta Selatan, DKI Jakarta<br />
+                12345 Indonesia
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg">
+                <Phone className="w-8 h-8 text-white" />
+              </div>
+              <h4 className="font-bold text-gray-800 mb-2">Telepon</h4>
+              <p className="text-gray-600">
+                +62 21 1234 5678<br />
+                +62 812 3456 7890<br />
+                (Senin - Minggu, 24 Jam)
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg">
+                <Mail className="w-8 h-8 text-white" />
+              </div>
+              <h4 className="font-bold text-gray-800 mb-2">Email</h4>
+              <p className="text-gray-600">
+                info@apotekb213.com<br />
+                customer@apotekb213.com<br />
+                support@apotekb213.com
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Customer Reviews */}
+        <section className="mb-16">
+          <div className="text-center mb-12">
+            <h3 className="text-4xl font-black bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-4">
+              Testimoni Pelanggan
+            </h3>
+            <p className="text-gray-600 text-lg">
+              Kepuasan pelanggan adalah prioritas utama kami
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+              <div className="flex gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                ))}
+              </div>
+              <p className="text-gray-600 mb-6 italic">
+                "Pelayanan sangat memuaskan, apotekernya ramah dan profesional. Harga juga terjangkau. Recommended!"
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full flex items-center justify-center text-white font-bold">
+                  BS
+                </div>
+                <div>
+                  <p className="font-bold text-gray-800">Budi Santoso</p>
+                  <p className="text-sm text-gray-500">Jakarta Selatan</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+              <div className="flex gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                ))}
+              </div>
+              <p className="text-gray-600 mb-6 italic">
+                "Apotek langganan keluarga. Stoknya lengkap dan selalu ada. Apotekernya juga sabar menjelaskan."
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-red-400 rounded-full flex items-center justify-center text-white font-bold">
+                  SP
+                </div>
+                <div>
+                  <p className="font-bold text-gray-800">Siti Permata</p>
+                  <p className="text-sm text-gray-500">Jakarta Timur</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+              <div className="flex gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                ))}
+              </div>
+              <p className="text-gray-600 mb-6 italic">
+                "Buka 24 jam sangat membantu saat butuh obat mendesak. Tempatnya bersih dan nyaman. Mantap!"
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-teal-400 rounded-full flex items-center justify-center text-white font-bold">
+                  AW
+                </div>
+                <div>
+                  <p className="font-bold text-gray-800">Ahmad Wijaya</p>
+                  <p className="text-sm text-gray-500">Tangerang</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
       </main>
 
-      {/* Footer with Modern Design */}
+      {/* Footer with Login Button */}
       <footer className="relative mt-20 bg-gradient-to-br from-gray-900 via-gray-800 to-emerald-900 text-white overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDE0YzMuMzE0IDAgNi0yLjY4NiA2LTZzLTIuNjg2LTYtNi02LTYgMi42ODYtNiA2IDIuNjg2IDYgNiA2em0wIDJ2LTJhNiA2IDAgMTAwIDEyek0yNCA0NGMzLjMxNCAwIDYtMi42ODYgNi02cy0yLjY4Ni02LTYtNi02IDIuNjg2LTYgNiAyLjY4NiA2IDYgNnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-50"></div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center">
+          <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-xl">
                 <Pill className="w-6 h-6 text-white" />
@@ -351,6 +353,17 @@ export default function CustomerPage() {
                 © {new Date().getFullYear()} Apotek B213. Semua hak dilindungi undang-undang.
               </p>
             </div>
+          </div>
+
+          {/* Login Button - Bottom Right */}
+          <div className="absolute bottom-8 right-8">
+            <Link
+              href="/login"
+              className="group relative px-5 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105 flex items-center gap-2"
+            >
+              <LogIn className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
+              <span className="font-bold text-sm">Admin Login</span>
+            </Link>
           </div>
         </div>
       </footer>

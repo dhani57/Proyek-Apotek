@@ -387,6 +387,9 @@ function TransactionsPage() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                       Status
                     </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -428,21 +431,15 @@ function TransactionsPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => printReceipt(transaction)}
-                            className="p-2 bg-emerald-100 text-emerald-600 hover:bg-emerald-200 rounded-lg transition-colors"
-                            title="Cetak Struk"
-                          >
-                            <Printer className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => setSelectedTransaction(transaction)}
-                            className="px-3 py-1 bg-blue-100 text-blue-600 hover:bg-blue-200 rounded-lg transition-colors text-xs font-medium"
-                          >
-                            Detail
-                          </button>
-                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedTransaction(transaction);
+                          }}
+                          className="px-3 py-1 bg-blue-100 text-blue-600 hover:bg-blue-200 rounded-lg transition-colors text-xs font-medium"
+                        >
+                          Detail
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -455,7 +452,7 @@ function TransactionsPage() {
 
       {/* Detail Modal */}
       {selectedTransaction && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-gradient-to-br from-blue-50 via-emerald-50 to-teal-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b">
               <div className="flex justify-between items-start">

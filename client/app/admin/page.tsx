@@ -60,7 +60,7 @@ function AdminDashboard() {
               t.createdAt && new Date(t.createdAt).toISOString().split('T')[0] === date
             )
           : [];
-        const total = dayTransactions.reduce((sum: number, t: any) => sum + (t.totalAmount || 0), 0);
+        const total = dayTransactions.reduce((sum: number, t: any) => sum + (t.totalPrice || 0), 0);
         return {
           date: new Date(date).toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric' }),
           sales: total,
@@ -225,7 +225,7 @@ function AdminDashboard() {
                         </div>
                         <div className="text-right">
                           <p className="text-sm font-bold text-emerald-600">
-                            {formatCurrency(transaction.totalAmount || 0)}
+                            {formatCurrency(transaction.totalPrice || 0)}
                           </p>
                           <p className="text-xs text-gray-500 capitalize">
                             {transaction.paymentMethod?.toLowerCase() || 'cash'}

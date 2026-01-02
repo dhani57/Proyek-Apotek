@@ -158,25 +158,25 @@ function AdminDashboard() {
                   <TrendingUp className="h-5 w-5 text-emerald-600" />
                   Penjualan 7 Hari Terakhir
                 </h3>
-                <div className="h-64">
+                <div className="h-64 flex flex-col">
                   {salesData.length > 0 ? (
-                    <div className="flex items-end justify-between h-full gap-2">
+                    <div className="flex-1 flex items-end justify-between gap-2 pb-8">
                       {salesData.map((data, index) => {
                         const maxSales = Math.max(...salesData.map(d => d.sales), 1);
-                        const heightPercent = (data.sales / maxSales) * 100;
+                        const heightPercent = maxSales > 0 ? (data.sales / maxSales) * 100 : 0;
                         return (
-                          <div key={index} className="flex-1 flex flex-col items-center gap-2">
-                            <div className="w-full bg-gray-100 rounded-t-lg relative group">
+                          <div key={index} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+                            <div className="w-full flex flex-col justify-end relative group" style={{ height: '100%' }}>
                               <div
-                                className="w-full bg-gradient-to-t from-emerald-600 to-emerald-400 rounded-t-lg transition-all duration-300 hover:from-emerald-700 hover:to-emerald-500 min-h-5"
-                                style={{ height: `${Math.max(heightPercent, 10)}%` }}
+                                className="w-full bg-gradient-to-t from-emerald-600 to-emerald-400 rounded-t-lg transition-all duration-300 hover:from-emerald-700 hover:to-emerald-500"
+                                style={{ height: `${Math.max(heightPercent, 5)}%` }}
                               >
-                                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
                                   {formatCurrency(data.sales)}
                                 </div>
                               </div>
                             </div>
-                            <p className="text-xs text-gray-600 font-medium">{data.date}</p>
+                            <p className="text-xs text-gray-600 font-medium mt-1">{data.date}</p>
                           </div>
                         );
                       })}

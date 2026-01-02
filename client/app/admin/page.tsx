@@ -160,26 +160,117 @@ function AdminDashboard() {
                 </h3>
                 <div className="h-64 flex flex-col">
                   {salesData.length > 0 ? (
-                    <div className="flex-1 flex items-end justify-between gap-2 pb-8">
-                      {salesData.map((data, index) => {
-                        const maxSales = Math.max(...salesData.map(d => d.sales), 1);
-                        const heightPercent = maxSales > 0 ? (data.sales / maxSales) * 100 : 0;
-                        return (
-                          <div key={index} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
-                            <div className="w-full flex flex-col justify-end relative group" style={{ height: '100%' }}>
-                              <div
-                                className="w-full bg-gradient-to-t from-emerald-600 to-emerald-400 rounded-t-lg transition-all duration-300 hover:from-emerald-700 hover:to-emerald-500"
-                                style={{ height: `${Math.max(heightPercent, 5)}%` }}
-                              >
-                                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                                  {formatCurrency(data.sales)}
-                                </div>
-                              </div>
-                            </div>
-                            <p className="text-xs text-gray-600 font-medium mt-1">{data.date}</p>
+                    <div className="flex-1 flex flex-col">
+                      <div className="flex-1 relative">
+                        <svg 
+                          viewBox="0 0 700 200" 
+                          className="w-full h-full"
+                          preserveAspectRatio="none"
+                        >
+                          <defs>
+                            <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                              <stop offset="0%" stopColor="rgb(16, 185, 129)" stopOpacity="0.3" />
+                              <stop offset="100%" stopColor="rgb(16, 185, 129)" stopOpacity="0.05" />
+                            </linearGradient>
+                          </defs>
+                          {(() => {
+                            const maxSales = Math.max(...salesData.map(d => d.sales), 1);
+                            const points = salesData.map((data, index) => {
+                              const x = (index / (salesData.length - 1)) * 700;
+                              const y = 200 - ((data.sales / maxSales) * 180);
+                              return { x, y, sales: data.sales };
+                            });
+
+                            // Create smooth curve path
+                            const createSmoothPath = (points: any[]) => {
+                              if (points.length < 2) return '';
+                              
+                              let path = `M ${points[0].x} ${points[0].y}`;
+                              
+                              for (let i = 0; i < points.length - 1; i++) {
+                                const current = points[i];
+                                const next = points[i + 1];
+                                const controlX = (current.x + next.x) / 2;
+                                
+                                path += ` Q ${controlX} ${current.y}, ${controlX} ${(current.y + next.y) / 2}`;
+                                path += ` Q ${controlX} ${next.y}, ${next.x} ${next.y}`;
+                              }
+                              
+                              return path;
+                            };
+
+                            const linePath = createSmoothPath(points);
+                            const areaPath = `${linePath} L 700 200 L 0 200 Z`;
+
+                            return (
+                              <>
+                                {/* Area fill */}
+                                <path
+                                  d={areaPath}
+                                  fill="url(#areaGradient)"
+                                  className="transition-all duration-300"
+                                />
+                                
+                                {/* Line */}
+                                <path
+                                  d={linePath}
+                                  fill="none"
+                                  stroke="rgb(16, 185, 129)"
+                                  strokeWidth="3"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="transition-all duration-300"
+                                />
+                                
+                                {/* Data points */}
+                                {points.map((point, index) => (
+                                  <g key={index}>
+                                    <circle
+                                      cx={point.x}
+                                      cy={point.y}
+                                      r="5"
+                                      fill="white"
+                                      stroke="rgb(16, 185, 129)"
+                                      strokeWidth="3"
+                                      className="transition-all duration-300 hover:r-7 cursor-pointer"
+                                    />
+                                    <g className="opacity-0 hover:opacity-100 transition-opacity">
+                                      <rect
+                                        x={point.x - 50}
+                                        y={point.y - 35}
+                                        width="100"
+                                        height="25"
+                                        rx="5"
+                                        fill="rgb(31, 41, 55)"
+                                        className="pointer-events-none"
+                                      />
+                                      <text
+                                        x={point.x}
+                                        y={point.y - 18}
+                                        textAnchor="middle"
+                                        fill="white"
+                                        fontSize="12"
+                                        className="pointer-events-none font-medium"
+                                      >
+                                        {formatCurrency(point.sales)}
+                                      </text>
+                                    </g>
+                                  </g>
+                                ))}
+                              </>
+                            );
+                          })()}
+                        </svg>
+                      </div>
+                      
+                      {/* X-axis labels */}
+                      <div className="flex justify-between mt-4 px-2">
+                        {salesData.map((data, index) => (
+                          <div key={index} className="text-xs text-gray-600 font-medium">
+                            {data.date}
                           </div>
-                        );
-                      })}
+                        ))}
+                      </div>
                     </div>
                   ) : (
                     <div className="flex items-center justify-center h-full text-gray-500">
